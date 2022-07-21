@@ -101,7 +101,7 @@ UNIFEX_TERM yuv_to_jpeg(UnifexEnv* env, UnifexPayload *payload, int width, int h
   unsigned char *jpegBuf = NULL;
   unsigned long jpegSize;
   int res;
-  UnifexPayload *jpegFrame;
+  UnifexPayload *jpegFrame = (UnifexPayload *)unifex_alloc(sizeof(UnifexPayload));
   UNIFEX_TERM ret;
 
   res = format_to_tjsamp(format);
@@ -127,7 +127,7 @@ UNIFEX_TERM yuv_to_jpeg(UnifexEnv* env, UnifexPayload *payload, int width, int h
     ret = yuv_to_jpeg_result_error(env, tjGetErrorStr2(tjh));
     goto cleanup;
   } else {
-    jpegFrame = unifex_payload_alloc(env, UNIFEX_PAYLOAD_BINARY, jpegSize);
+    unifex_payload_alloc(env, UNIFEX_PAYLOAD_BINARY, jpegSize, jpegFrame);
     if(!jpegFrame) {
       ret = yuv_to_jpeg_result_error(env, "payload_alloc");
     } else {
@@ -151,7 +151,7 @@ UNIFEX_TERM jpeg_to_yuv(UnifexEnv* env, UnifexPayload *payload) {
   enum TJSAMP tjsamp;
   enum TJCS cspace;
   unsigned long yuvBufSize;
-  UnifexPayload *yuvFrame;
+  UnifexPayload *yuvFrame = (UnifexPayload *)unifex_alloc(sizeof(UnifexPayload));
   int res, width, height;
   UNIFEX_TERM ret;
 
@@ -172,7 +172,7 @@ UNIFEX_TERM jpeg_to_yuv(UnifexEnv* env, UnifexPayload *payload) {
   } 
   
   yuvBufSize = tjBufSizeYUV2(width, 4, height, tjsamp);
-  yuvFrame = unifex_payload_alloc(env, UNIFEX_PAYLOAD_BINARY, yuvBufSize);
+  unifex_payload_alloc(env, UNIFEX_PAYLOAD_BINARY, yuvBufSize, yuvFrame);
   if(!yuvFrame) {
     ret = jpeg_to_yuv_result_error(env, "could not allocate frame");
     goto cleanup;
